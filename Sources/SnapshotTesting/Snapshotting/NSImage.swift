@@ -46,10 +46,22 @@ extension Snapshotting where Value == NSImage, Format == NSImage {
 }
 
 private func NSImagePNGRepresentation(_ image: NSImage) -> Data? {
-  guard let cgImage = image.cgImage(forProposedRect: nil, context: nil, hints: nil) else { return nil }
-  let rep = NSBitmapImageRep(cgImage: cgImage)
-  rep.size = image.size
-  return rep.representation(using: .png, properties: [:])
+  guard let tiffRepresentation = image.tiffRepresentation,
+      let bitmapImage = NSBitmapImageRep(data: tiffRepresentation)
+  else {
+      return nil
+  }
+
+  var pointsSize = bitmapImage.size
+  let pixelSize = CGSize(width: bitmapImage.pixelsWide, height: bitmapImage.pixelsHigh)
+
+  let scale = NSScreen.main?.backingScaleFactor ?? 1.0
+  pointsSize.width = ceil(pixelSize.width / scale)
+  pointsSize.height = ceil(pixelSize.height / scale)
+
+  bitmapImage.size = pointsSize
+
+  return bitmapImage.representation(using: .png, properties: [:])
 }
 
 private func compare(_ old: NSImage, _ new: NSImage, precision: Float) -> Bool {
