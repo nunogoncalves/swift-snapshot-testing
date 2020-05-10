@@ -51,16 +51,7 @@ private func NSImagePNGRepresentation(_ image: NSImage) -> Data? {
   else {
       return nil
   }
-
-  var pointsSize = bitmapImage.size
-  let pixelSize = CGSize(width: bitmapImage.pixelsWide, height: bitmapImage.pixelsHigh)
-
-  let scale = NSScreen.main?.backingScaleFactor ?? 1.0
-  pointsSize.width = ceil(pixelSize.width / scale)
-  pointsSize.height = ceil(pixelSize.height / scale)
-
-  bitmapImage.size = pointsSize
-
+  bitmapImage.size = CGSize(width: bitmapImage.pixelsWide, height: bitmapImage.pixelsHigh)
   return bitmapImage.representation(using: .png, properties: [:])
 }
 
